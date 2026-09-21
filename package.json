@@ -1,0 +1,29 @@
+{
+  "name": "aerocon-backend",
+  "version": "1.0.0",
+  "description": "Aerocon Star Gazing Event Registration Backend",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [
+    "aerocon",
+    "mern",
+    "express",
+    "mongoose",
+    "star-gazing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongodb": "^7.6.0",
+    "mongoose": "^8.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.2"
+  }
+}
