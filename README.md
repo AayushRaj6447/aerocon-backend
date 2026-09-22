@@ -6,29 +6,34 @@ Backend API for the Aerocon **Star Gazing** event registration system built usin
 
 ## Features
 
-- **9 Time Slots (10-minute intervals)**: Pre-seeded automatically from 6:30 PM to 8:00 PM.
-- **Strict Capacity Control (Max 8 per slot)**: Atomic database updates prevent race conditions and overbooking.
+- **2 Days (26th & 27th)**: Pre-seeded automatically with 9 slots per day (18 slots total).
+- **10-minute intervals**: From 6:30 PM to 8:00 PM on both days.
+- **Strict Capacity Control (Max 7 per slot)**: Atomic database updates prevent race conditions and overbooking beyond 7 people.
 - **Student Data Validation**: Validates `name`, `email`, `roll`, and `batch` (`k24`, `k25`, `k26`).
 - **One Registration Per Student**: Enforces unique roll and email across the entire event.
 - **Entry Passcode Generation**: Generates a unique 7-character alphanumeric passcode (e.g. `K7X9B2`) upon registration.
 - **Pass Verification & Check-in**: Verifies pass validity at the event entrance and marks passes as used to prevent reuse.
-- **CORS Configured**: Pre-configured for seamless frontend integration (React, Vite, Next.js).
+- **CORS Configured**: Restricted to `https://aerocon.vercel.app` (or customizable via `CLIENT_URL`).
 
 ---
 
-## Time Slots (6:30 PM - 8:00 PM)
+## Time Slots (26th & 27th, 6:30 PM - 8:00 PM)
+
+Each day (26th and 27th) has the following 9 intervals:
 
 | Slot # | Time Window | Max Capacity |
 | :--- | :--- | :--- |
-| 1 | 06:30 PM - 06:40 PM | 8 |
-| 2 | 06:40 PM - 06:50 PM | 8 |
-| 3 | 06:50 PM - 07:00 PM | 8 |
-| 4 | 07:00 PM - 07:10 PM | 8 |
-| 5 | 07:10 PM - 07:20 PM | 8 |
-| 6 | 07:20 PM - 07:30 PM | 8 |
-| 7 | 07:30 PM - 07:40 PM | 8 |
-| 8 | 07:40 PM - 07:50 PM | 8 |
-| 9 | 07:50 PM - 08:00 PM | 8 |
+| 1 | 06:30 PM - 06:40 PM | 7 |
+| 2 | 06:40 PM - 06:50 PM | 7 |
+| 3 | 06:50 PM - 07:00 PM | 7 |
+| 4 | 07:00 PM - 07:10 PM | 7 |
+| 5 | 07:10 PM - 07:20 PM | 7 |
+| 6 | 07:20 PM - 07:30 PM | 7 |
+| 7 | 07:30 PM - 07:40 PM | 7 |
+| 8 | 07:40 PM - 07:50 PM | 7 |
+| 9 | 07:50 PM - 08:00 PM | 7 |
+
+*Total: 18 slots across 2 days (126 total seats).*
 
 ---
 
@@ -62,24 +67,25 @@ CLIENT_URL=*
 
 ## API Documentation
 
-### 1. Get All Slots
-Fetch all 9 slots with real-time remaining seat counts.
+### 1. Get All Available Slots
+Fetch slots with real-time remaining seat counts. Optionally filter by date (`?date=26th` or `?date=27th`).
 
-- **Endpoint**: `GET /api/slots`
+- **Endpoint**: `GET /api/slots` (or `GET /api/slots?date=26th`)
 - **Response**:
 ```json
 {
   "success": true,
-  "count": 9,
+  "count": 18,
   "data": [
     {
       "_id": "664fa1...",
+      "date": "26th",
       "slotNumber": 1,
       "startTime": "18:30",
       "endTime": "18:40",
       "displayTime": "06:30 PM - 06:40 PM",
-      "maxCapacity": 8,
-      "bookedCount": 3,
+      "maxCapacity": 7,
+      "bookedCount": 2,
       "remainingSeats": 5,
       "isFull": false
     }

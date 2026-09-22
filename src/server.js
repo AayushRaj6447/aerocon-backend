@@ -16,14 +16,25 @@ const startDB = async () => {
 startDB();
 
 // CORS Configuration
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map((o) => o.trim())
+const rawOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((o) => o.trim().replace(/\/$/, ''))
   : ['*'];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. mobile apps, curl, Postman)
-    if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (e.g. curl, mobile, server health checks)
+    if (!origin) return callback(null, true);
+
+    const normalizedOrigin = origin.replace(/\/$/, '');
+
+    const isAllowed =
+      rawOrigins.includes('*') ||
+      rawOrigins.some((allowed) => {
+        const withProtocol = allowed.startsWith('http') ? allowed : `https://${allowed}`;
+        return withProtocol === normalizedOrigin;
+      });
+
+    if (isAllowed) {
       callback(null, true);
     } else {
       callback(new Error(`Origin ${origin} not allowed by CORS`));

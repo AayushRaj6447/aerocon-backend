@@ -38,14 +38,15 @@ const register = async (req, res, next) => {
     // Check if email or roll is already registered
     const existingRegistration = await Registration.findOne({
       $or: [{ email }, { roll }],
-    }).populate('slot', 'displayTime slotNumber');
+    }).populate('slot', 'date displayTime slotNumber');
 
     if (existingRegistration) {
       const isEmailConflict = existingRegistration.email === email;
       const conflictField = isEmailConflict ? 'Email' : 'Roll number';
+      const slotDate = existingRegistration.slot?.date ? `${existingRegistration.slot.date} ` : '';
       return res.status(409).json({
         success: false,
-        message: `${conflictField} is already registered for slot #${existingRegistration.slot?.slotNumber} (${existingRegistration.slot?.displayTime}). Each student can only register once.`,
+        message: `${conflictField} is already registered for ${slotDate}Slot #${existingRegistration.slot?.slotNumber} (${existingRegistration.slot?.displayTime}). Each student can only register once.`,
         data: {
           passCode: existingRegistration.passCode,
           slot: existingRegistration.slot,
@@ -53,7 +54,7 @@ const register = async (req, res, next) => {
       });
     }
 
-    // Atomically find slot and increment bookedCount if bookedCount < maxCapacity (8)
+    // Atomically find slot and increment bookedCount if bookedCount < maxCapacity (7)
     reservedSlot = await Slot.findOneAndUpdate(
       { _id: slotId, $expr: { $lt: ['$bookedCount', '$maxCapacity'] } },
       { $inc: { bookedCount: 1 } },
@@ -69,9 +70,10 @@ const register = async (req, res, next) => {
           message: 'The requested slot does not exist.',
         });
       }
+      const slotDate = targetSlot.date ? `${targetSlot.date} ` : '';
       return res.status(400).json({
         success: false,
-        message: `Slot #${targetSlot.slotNumber} (${targetSlot.displayTime}) is fully booked (8/8 capacity reached). Please select another slot.`,
+        message: `${slotDate}Slot #${targetSlot.slotNumber} (${targetSlot.displayTime}) is fully booked (${targetSlot.maxCapacity}/${targetSlot.maxCapacity} capacity reached). Please select another slot.`,
       });
     }
 
@@ -95,7 +97,7 @@ const register = async (req, res, next) => {
     });
 
     // Populate slot info for response
-    await registration.populate('slot', 'slotNumber displayTime startTime endTime');
+    await registration.populate('slot', 'date slotNumber displayTime startTime endTime');
 
     return res.status(201).json({
       success: true,
@@ -108,6 +110,7 @@ const register = async (req, res, next) => {
         batch: registration.batch,
         passCode: registration.passCode,
         slot: {
+          date: registration.slot.date,
           slotNumber: registration.slot.slotNumber,
           displayTime: registration.slot.displayTime,
           startTime: registration.slot.startTime,
@@ -152,7 +155,7 @@ const verifyPass = async (req, res, next) => {
 
     const registration = await Registration.findOne({ passCode }).populate(
       'slot',
-      'slotNumber displayTime startTime endTime'
+      'date slotNumber displayTime startTime endTime'
     );
 
     if (!registration) {
@@ -205,7 +208,7 @@ const verifyPass = async (req, res, next) => {
 const getRegistrations = async (req, res, next) => {
   try {
     const registrations = await Registration.find()
-      .populate('slot', 'slotNumber displayTime startTime endTime')
+      .populate('slot', 'date slotNumber displayTime startTime endTime')
       .sort({ registeredAt: -1 });
 
     res.status(200).json({

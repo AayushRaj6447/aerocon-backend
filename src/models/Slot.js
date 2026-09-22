@@ -2,10 +2,14 @@ const mongoose = require('mongoose');
 
 const slotSchema = new mongoose.Schema(
   {
+    date: {
+      type: String, // "26th" or "27th"
+      required: true,
+      enum: ['26th', '27th'],
+    },
     slotNumber: {
       type: Number,
       required: true,
-      unique: true,
       min: 1,
     },
     startTime: {
@@ -22,7 +26,7 @@ const slotSchema = new mongoose.Schema(
     },
     maxCapacity: {
       type: Number,
-      default: 8,
+      default: 7,
       min: 1,
     },
     bookedCount: {
@@ -47,6 +51,9 @@ slotSchema.virtual('remainingSeats').get(function () {
 slotSchema.virtual('isFull').get(function () {
   return this.bookedCount >= this.maxCapacity;
 });
+
+// Compound unique index so each date has its own slotNumbers (1 to 9)
+slotSchema.index({ date: 1, slotNumber: 1 }, { unique: true });
 
 module.exports = mongoose.model('Slot', slotSchema);
 
