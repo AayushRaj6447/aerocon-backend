@@ -29,14 +29,16 @@ const seedSlots = async () => {
       await Slot.deleteMany({ date: { $exists: false } });
     }
 
-    const count = await Slot.countDocuments();
-    if (count === 0) {
-      console.log('Initializing 10-minute slots for 26th and 27th (6:30 PM - 8:00 PM, 7 seats each)...');
-      await Slot.insertMany(defaultSlots);
-      console.log(`Successfully seeded ${defaultSlots.length} slots (9 slots for 26th, 9 slots for 27th, 7 capacity each).`);
-    } else {
-      console.log(`Slots already initialized (${count} slots found).`);
+    // Ensure all 18 slots (9 for 26th and 9 for 27th) exist in the database
+    for (const slot of defaultSlots) {
+      await Slot.findOneAndUpdate(
+        { date: slot.date, slotNumber: slot.slotNumber },
+        { $setOnInsert: slot },
+        { upsert: true, new: true }
+      );
     }
+    const count = await Slot.countDocuments();
+    console.log(`Slots initialized: ${count} total slots available across 26th and 27th.`);
   } catch (error) {
     console.error('Error seeding slots:', error.message);
   }
