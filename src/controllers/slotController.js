@@ -10,11 +10,16 @@ const getSlots = async (req, res, next) => {
     const filter = {};
 
     if (req.query.date) {
-      let requestedDate = req.query.date.trim().toLowerCase();
-      if (requestedDate === '26' || requestedDate === '26th') {
-        filter.date = '26th';
-      } else if (requestedDate === '27' || requestedDate === '27th') {
+      const requestedDate = req.query.date.toString().trim().toLowerCase();
+      // Remove 4-digit year (e.g. 2026) so it doesn't falsely match '26'
+      const withoutYear = requestedDate.replace(/\b20\d{2}\b/g, '');
+
+      if (withoutYear.includes('27')) {
         filter.date = '27th';
+      } else if (withoutYear.includes('26')) {
+        filter.date = '26th';
+      } else {
+        filter.date = requestedDate;
       }
     }
 
