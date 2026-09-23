@@ -25,6 +25,29 @@ const getSlots = async (req, res, next) => {
 
     const slots = await Slot.find(filter).sort({ date: 1, slotNumber: 1 });
 
+    // Auto-reconcile bookedCount with actual registrations so phantom bookings never occur
+    try {
+      const Registration = require('../models/Registration');
+      const regCounts = await Registration.aggregate([
+        { $group: { _id: '$slot', count: { $sum: 1 } } },
+      ]);
+      const countMap = new Map();
+      regCounts.forEach((r) => {
+        if (r._id) countMap.set(r._id.toString(), r.count);
+      });
+
+      for (const slot of slots) {
+        const realCount = countMap.get(slot._id.toString()) || 0;
+        if (slot.bookedCount !== realCount) {
+          slot.bookedCount = realCount;
+          Slot.updateOne({ _id: slot._id }, { $set: { bookedCount: realCount } }).exec();
+        }
+      }
+    } catch (syncErr) {
+      // Continue even if reconciliation fails
+      console.warn('Slot count sync warning:', syncErr.message);
+    }
+
     res.status(200).json({
       success: true,
       count: slots.length,

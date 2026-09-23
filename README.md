@@ -6,8 +6,8 @@ Backend API for the Aerocon **Star Gazing** event registration system built usin
 
 ## Features
 
-- **2 Days (26th & 27th)**: Pre-seeded automatically with 9 slots per day (18 slots total).
-- **10-minute intervals**: From 6:30 PM to 8:00 PM on both days.
+- **2 Days (26th & 27th)**: Pre-seeded automatically with 6 slots per day (12 slots total).
+- **10-minute intervals**: From 7:00 PM to 8:00 PM on both days.
 - **Strict Capacity Control (Max 7 per slot)**: Atomic database updates prevent race conditions and overbooking beyond 7 people.
 - **Student Data Validation**: Validates `name`, `email`, `roll`, and `batch` (`k24`, `k25`, `k26`).
 - **One Registration Per Student**: Enforces unique roll and email across the entire event.
@@ -17,23 +17,20 @@ Backend API for the Aerocon **Star Gazing** event registration system built usin
 
 ---
 
-## Time Slots (26th & 27th, 6:30 PM - 8:00 PM)
+## Time Slots (26th & 27th, 7:00 PM - 8:00 PM)
 
-Each day (26th and 27th) has the following 9 intervals:
+Each day (26th and 27th) has the following 6 intervals:
 
 | Slot # | Time Window | Max Capacity |
 | :--- | :--- | :--- |
-| 1 | 06:30 PM - 06:40 PM | 7 |
-| 2 | 06:40 PM - 06:50 PM | 7 |
-| 3 | 06:50 PM - 07:00 PM | 7 |
-| 4 | 07:00 PM - 07:10 PM | 7 |
-| 5 | 07:10 PM - 07:20 PM | 7 |
-| 6 | 07:20 PM - 07:30 PM | 7 |
-| 7 | 07:30 PM - 07:40 PM | 7 |
-| 8 | 07:40 PM - 07:50 PM | 7 |
-| 9 | 07:50 PM - 08:00 PM | 7 |
+| 1 | 07:00 PM - 07:10 PM | 7 |
+| 2 | 07:10 PM - 07:20 PM | 7 |
+| 3 | 07:20 PM - 07:30 PM | 7 |
+| 4 | 07:30 PM - 07:40 PM | 7 |
+| 5 | 07:40 PM - 07:50 PM | 7 |
+| 6 | 07:50 PM - 08:00 PM | 7 |
 
-*Total: 18 slots across 2 days (126 total seats).*
+*Total: 12 slots across 2 days (84 total seats).*
 
 ---
 
